@@ -47,6 +47,8 @@
   --mars-bright: oklch(0.79 0.13 48);
   --ice: oklch(0.78 0.075 205);
   --surface: oklch(0.16 0.009 245);
+  --habitat-ruby: #ed002b;
+  --habitat-anchor: #ffffff;
   --shadow-overlay: 0 24px 80px oklch(0.04 0 0 / 65%);
   --logo-edge-mask: radial-gradient(ellipse, oklch(1 0 0) 48%, transparent 75%);
 }

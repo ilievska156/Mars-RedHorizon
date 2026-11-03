@@ -1,9 +1,10 @@
-import { Suspense, useRef } from "react";
+import { Suspense, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Billboard, Environment, Lightformer, OrbitControls, useTexture, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import marsMap from "@/assets/mars-surface.jpg.asset.json";
 import { habitats, type Habitat } from "@/lib/habitats";
+import { isMarkerVisible, MARKER_RADIUS } from "@/lib/marker-visibility";
 
 type MarsGlobeProps = {
   mode: "habitats" | "explore";
@@ -12,27 +13,31 @@ type MarsGlobeProps = {
 };
 
 function Marker({ habitat, active, onSelect }: { habitat: Habitat; active: boolean; onSelect: (habitat: Habitat) => void }) {
-  const radius = 2.02;
+  const radius = MARKER_RADIUS;
   const x = Math.sin(habitat.lon) * Math.cos(habitat.lat) * radius;
   const y = Math.sin(habitat.lat) * radius;
   const z = Math.cos(habitat.lon) * Math.cos(habitat.lat) * radius;
   const ruby = useRef<THREE.Group>(null);
+  const marker = useRef<THREE.Group>(null);
+  const vectors = useMemo(() => ({ anchor: new THREE.Vector3(), center: new THREE.Vector3(), normal: new THREE.Vector3(), camera: new THREE.Vector3() }), []);
+  const rubyColor = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue("--habitat-ruby").trim(), []);
+  const dotColor = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue("--habitat-anchor").trim(), []);
   const BASE = 1.25;
   useFrame((state) => {
-    if (!ruby.current) return;
-    const pulse = active ? BASE * (1 + 0.16 * Math.sin(state.clock.elapsedTime * 3.4)) : BASE;
+    if (!ruby.current || !marker.current) return;
+    marker.current.getWorldPosition(vectors.anchor);
+    marker.current.parent?.getWorldPosition(vectors.center);
+    vectors.normal.copy(vectors.anchor).sub(vectors.center).normalize();
+    state.camera.getWorldPosition(vectors.camera).sub(vectors.center);
+    marker.current.visible = isMarkerVisible(vectors.normal, vectors.camera);
+    const pulse = active ? BASE * (1 + 0.04 * Math.sin(state.clock.elapsedTime * 3.4)) : BASE;
     ruby.current.scale.setScalar(pulse);
   });
   const handleClick = (event: { stopPropagation: () => void }) => { event.stopPropagation(); onSelect(habitat); };
   return (
-    <group position={[x, y, z]}>
-      {/* anchor dot holding the gem to the surface */}
-      <mesh onClick={handleClick}>
-        <sphereGeometry args={[0.021, 8, 8]} />
-        <meshBasicMaterial color={active ? "#ffd1dc" : "#ff0f2f"} />
-      </mesh>
+    <group ref={marker} position={[x, y, z]}>
       <Billboard>
-        <group ref={ruby} position={[0, 0.24, 0]}>
+        <group ref={ruby} position={[0, 0.13, 0]}>
           {/* faceted ruby body */}
           <mesh
             scale={[1, 0.72, 0.5]}
@@ -41,26 +46,29 @@ function Marker({ habitat, active, onSelect }: { habitat: Habitat; active: boole
             onPointerOut={() => { document.body.style.cursor = ""; }}
           >
             <octahedronGeometry args={[0.095, 0]} />
-            <meshStandardMaterial
-              color={active ? "#ff1f3f" : "#e00033"}
-              roughness={0.1}
-              metalness={0.12}
-              emissive={active ? "#c2002a" : "#70001c"}
-              emissiveIntensity={active ? 2.2 : 1.15}
+            <meshPhysicalMaterial
+              color={rubyColor}
+              roughness={0.18}
+              metalness={0}
+              clearcoat={0.85}
+              clearcoatRoughness={0.12}
+              ior={1.76}
+              emissive={rubyColor}
+              emissiveIntensity={0.12}
+              toneMapped={false}
               flatShading
             />
           </mesh>
-          {/* inner light core */}
-          <mesh scale={[0.42, 0.32, 0.24]} onClick={handleClick}>
-            <octahedronGeometry args={[0.095, 0]} />
-            <meshBasicMaterial color={active ? "#fff0f3" : "#ff3d5e"} transparent opacity={0.92} />
-          </mesh>
-          {/* soft red halo */}
-          <mesh scale={[1.8, 1.3, 0.2]}>
-            <octahedronGeometry args={[0.095, 0]} />
-            <meshBasicMaterial color="#ff1233" transparent opacity={active ? 0.3 : 0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
-          </mesh>
         </group>
+        {/* white anchor dot marking the exact habitat location */}
+        <mesh
+          onClick={handleClick}
+          onPointerOver={(event) => { event.stopPropagation(); document.body.style.cursor = "pointer"; }}
+          onPointerOut={() => { document.body.style.cursor = ""; }}
+        >
+          <circleGeometry args={[0.024, 24]} />
+          <meshBasicMaterial color={dotColor} toneMapped={false} />
+        </mesh>
       </Billboard>
     </group>
   );
