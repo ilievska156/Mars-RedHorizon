@@ -13,6 +13,7 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    base: process.env.DEPLOY_BASE || "/",
     plugins: [
       {
         name: "ignore-broken-hmr-sockets",
