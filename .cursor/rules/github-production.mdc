@@ -1,0 +1,14 @@
+---
+description: Work locally; production is only GitHub ilievska156
+alwaysApply: true
+---
+
+# Local work, GitHub production
+
+Joana always develops this project **locally** in this folder. Production updates go **only** through GitHub account **ilievska156**.
+
+- Edit, run, and test with the local app (`npm run dev`, local files).
+- When she asks to push or ship to production, commit (if she asked) and `git push` to `https://github.com/ilievska156/Mars-RedHorizon.git`, usually `main`.
+- Do not push to any other GitHub account or fork.
+- Do not use HostGator/SFTP as the production workflow.
+- Before pushing, confirm `git remote get-url origin` is that ilievska156 URL. If it is not, stop and fix origin.

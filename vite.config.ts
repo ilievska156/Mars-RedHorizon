@@ -12,4 +12,26 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    plugins: [
+      {
+        name: "ignore-broken-hmr-sockets",
+        configureServer(server) {
+          const ignore = (error: { code?: string }) => {
+            if (error?.code === "WS_ERR_UNEXPECTED_RSV_1") return;
+            console.error(error);
+          };
+          process.on("uncaughtException", (error: NodeJS.ErrnoException) => {
+            if (error?.code === "WS_ERR_UNEXPECTED_RSV_1") return;
+            console.error(error);
+            process.exit(1);
+          });
+          server.ws.on("error", ignore);
+          server.ws.on("connection", (socket) => {
+            socket.on("error", ignore);
+          });
+        },
+      },
+    ],
+  },
 });
