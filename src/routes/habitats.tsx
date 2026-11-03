@@ -30,7 +30,7 @@ const metricDefinitions = [
 ] as const;
 
 function Score({ value = 91 }: { value?: number }) {
-  return <div className="score-ring" aria-label={`Site suitability score ${value} out of 100`}>{value}</div>;
+  return <div className="score-ring" aria-label={`Sustainability score ${value} out of 100`}>{value}</div>;
 }
 
 function MetricBars({ habitat, compact = false }: { habitat: Habitat; compact?: boolean }) {
@@ -55,7 +55,7 @@ function HabitatsPage() {
     {detail ? <>
       <div className="mission-banner" style={{ backgroundImage: `linear-gradient(0deg, var(--background), transparent 90%), url(${landscape})` }}>
         <div className="mission-banner-top"><Button variant="ghost" onClick={() => setDetail(false)}><ArrowLeft size={15} /> Explore / Red Horizon</Button><div className="mission-banner-actions"><Button variant="missionOutline" onClick={toggleSaved}><Bookmark size={14} /> {saved.includes(selected.id) ? "Saved" : "Save site"}</Button></div></div>
-        <div className="mission-banner-bottom"><div><div className="small-label">{"\n"}</div><h1>{selected.name}</h1><span className="section-label" /></div><div className="banner-score"><Score value={selected.score} /><span>Illustrative suitability<br />{selected.score >= 90 ? "High potential" : "Viable candidate"}</span></div></div>
+        <div className="mission-banner-bottom"><div><div className="small-label">{"\n"}</div><h1>{selected.name}</h1><span className="section-label" /></div><div className="banner-score"><Score value={selected.score} /><span>Sustainability score</span></div></div>
       </div>
       <div className="detail-layout">
         <div className="detail-main">
