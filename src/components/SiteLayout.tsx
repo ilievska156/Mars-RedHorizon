@@ -11,6 +11,8 @@ const links = [
   { to: "/moons" as const, title: "Mars’s Moons", description: "Phobos and Deimos" },
 ];
 
+const resourcePdf = `${import.meta.env.BASE_URL}Red-Horizon-Mars.pdf`;
+
 export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
@@ -26,11 +28,11 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       {children}
-      <footer className="footer page-gutter"><span></span><span><ArrowUpRight className="inline-block size-3" /></span></footer>
+      <footer className="footer page-gutter"><a href={resourcePdf} target="_blank" rel="noopener noreferrer">Red Horizon Mars PDF</a><span><ArrowUpRight className="inline-block size-3" /></span></footer>
       {open && <div className="menu-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <aside className="side-panel" aria-label="Site navigation">
-          <div className="side-panel-top"><span className="section-label">Navigation / 05</span><Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close navigation menu"><X size={22} /></Button></div>
+          <div className="side-panel-top"><span className="section-label">Navigation / 06</span><Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close navigation menu"><X size={22} /></Button></div>
           <nav className="side-panel-list">
             {links.map((link, index) => (
               <Link key={link.to} to={link.to} className="side-link" onClick={() => setOpen(false)}>
@@ -41,6 +43,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             <a href="https://eyes.nasa.gov/apps/solar-system/#/mars" target="_blank" rel="noopener noreferrer" className="side-link" onClick={() => setOpen(false)}>
               <span className="side-link-num">05</span>
               <span><span className="side-link-title">Mars Live <ArrowUpRight className="inline-block size-5" /></span><span className="side-link-desc">opens in a new tab</span></span>
+            </a>
+            <a href={resourcePdf} target="_blank" rel="noopener noreferrer" className="side-link" onClick={() => setOpen(false)}>
+              <span className="side-link-num">06</span>
+              <span><span className="side-link-title">Resources <ArrowUpRight className="inline-block size-5" /></span><span className="side-link-desc">Red Horizon Mars PDF</span></span>
             </a>
           </nav>
           <div className="side-foot"></div>
